@@ -3,7 +3,7 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import {
-  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, ChevronDown, LogOut
+  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, ChevronDown, LogOut, Menu
 } from "lucide-react";
 import HabitTracker from "./HabitTracker";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,8 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [userName, setUserName] = useState("");
-  const [habitsList, setHabitsList] = useState([]); // State for managing habits
+  const [habitsList, setHabitsList] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,7 +61,7 @@ const Dashboard = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
+      <div className={`w-64 bg-white shadow-lg fixed lg:relative transform transition-transform duration-200 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 z-30`}>
         <div className="p-4 border-b flex items-center gap-2">
           <Leaf className="text-emerald-500" />
           <span className="text-xl font-bold text-emerald-800">EcoTrack</span>
@@ -78,7 +79,10 @@ const Dashboard = () => {
             ].map(({ icon: Icon, label, id }) => (
               <li key={id}>
                 <button
-                  onClick={() => setActiveTab(id)}
+                  onClick={() => {
+                    setActiveTab(id);
+                    setIsSidebarOpen(false); // Close sidebar on mobile after clicking a link
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                     activeTab === id ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"
                   }`}
@@ -96,6 +100,12 @@ const Dashboard = () => {
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-50"
+          >
+            <Menu size={24} className="text-gray-700" />
+          </button>
           <h1 className="text-2xl font-bold text-gray-800 capitalize">{activeTab}</h1>
           {/* Profile Section */}
           <div className="relative">
