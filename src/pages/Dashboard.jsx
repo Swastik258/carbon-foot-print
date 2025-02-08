@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import {
-  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, ChevronDown
+  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, ChevronDown, LogOut
 } from "lucide-react";
-import HabitTracker from "./HabitTracker"; // Import Habit Tracker
+import HabitTracker from "./HabitTracker";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from "../firebaseConfig";
+import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import Impact from "./Impact";
+import AddHabit from "../habits/AddHabit";
+import Goal from "./Goal";
 
 const mockData = {
   weeklyProgress: [
@@ -29,8 +35,27 @@ const mockData = {
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
+  const [userName, setUserName] = useState("");
+  const [habitsList, setHabitsList] = useState([]); // State for managing habits
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (auth.currentUser) {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setUserName(userSnap.data().name);
+        }
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -49,6 +74,7 @@ const Dashboard = () => {
               { icon: TrendingDown, label: "Impact", id: "impact" },
               { icon: Award, label: "Goals", id: "goals" },
               { icon: Users, label: "Community", id: "community" },
+              { icon: Settings, label: "Settings", id: "settings" },
             ].map(({ icon: Icon, label, id }) => (
               <li key={id}>
                 <button
@@ -78,18 +104,18 @@ const Dashboard = () => {
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-50"
             >
               <User className="text-emerald-600" size={20} />
-              <span className="text-gray-700">John Doe</span>
+              <span className="text-gray-700">{userName || "John Doe"}</span>
               <ChevronDown className="text-gray-500" size={16} />
             </button>
             {showProfileMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10">
-                  <button className="w-full px-4 py-2 text-left text-black-600 hover:bg-gray-50">
-               Profile
+                <button className="w-full px-4 py-2 text-left text-black-600 hover:bg-gray-50">
+                  Profile
                 </button>
                 <button className="w-full px-4 py-2 text-left text-black-600 hover:bg-gray-50">
-               Notification
+                  Notification
                 </button>
-                <button onClick={()=> navigate('/login')}className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-50">
+                <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-50">
                   Sign Out
                 </button>
               </div>
@@ -134,7 +160,23 @@ const Dashboard = () => {
             </>
           )}
 
-          {activeTab === "habits" && <HabitTracker />}
+          {activeTab === "dashboard" && <h2>Welcome to your dashboard!</h2>}
+          {activeTab === "habits" && (
+            <HabitTracker
+              setActiveTab={setActiveTab}
+              habitsList={habitsList}
+              setHabitsList={setHabitsList}
+            />
+          )}
+          {activeTab === "impact" && <Impact />}
+          {activeTab === "add-habit" && (
+            <AddHabit
+              setActiveTab={setActiveTab}
+              habitsList={habitsList}
+              setHabitsList={setHabitsList}
+            />
+          )}
+          {activeTab === "goals" && <Goal />}
         </main>
       </div>
     </div>
