@@ -1,32 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebaseConfig"; 
-import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
-
+import { db,auth } from "../firebaseConfig"; 
+import { 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  doc 
+} from "firebase/firestore";
 const AddHabit = ({ setActiveTab, currentHabit, setCurrentHabit }) => {
   const [habit, setHabit] = useState("");
   const [description, setDescription] = useState("");
 
   // Load selected habit data for editing
-  useEffect(() => {
-    if (currentHabit) {
-      setHabit(currentHabit.habit);
-      setDescription(currentHabit.description);
-    }
-  }, [currentHabit]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (habit.trim() && description.trim()) {
       try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          alert("Please login to add habits");
+          return;
+        }
+
         if (currentHabit?.id) {
-          // If editing, update the existing habit
+          // Update existing habit
           const habitRef = doc(db, "habits", currentHabit.id);
-          await updateDoc(habitRef, { habit, description });
+          await updateDoc(habitRef, { 
+            habit, 
+            description,
+            updatedAt: new Date()
+          });
           alert("Habit updated successfully!");
           setCurrentHabit(null);
         } else {
-          // If adding a new habit
-          await addDoc(collection(db, "habits"), { habit, description, createdAt: new Date() });
+          // Add new habit with user ID
+          await addDoc(collection(db, "habits"), {
+            habit,
+            description,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
           alert("Habit added successfully!");
         }
 

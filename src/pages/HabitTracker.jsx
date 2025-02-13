@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebaseConfig"; // Firestore config
-import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
-
+import { db,auth } from "../firebaseConfig"; // Firestore config
+import { 
+  collection, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where 
+} from "firebase/firestore";
 const HabitTracker = ({ setActiveTab }) => {
   const [habitsList, setHabitsList] = useState([]);
   const [editingHabit, setEditingHabit] = useState(null);
@@ -12,7 +19,13 @@ const HabitTracker = ({ setActiveTab }) => {
   useEffect(() => {
     const fetchHabits = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "habits"));
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const habitsRef = collection(db, "habits");
+        const q = query(habitsRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
         const habits = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -25,9 +38,12 @@ const HabitTracker = ({ setActiveTab }) => {
     fetchHabits();
   }, []);
 
-  // Handle deleting a habit from Firestore
+  // Handle deleting a habit
   const handleDelete = async (id) => {
     try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
       await deleteDoc(doc(db, "habits", id));
       setHabitsList(habitsList.filter((habit) => habit.id !== id));
     } catch (error) {
@@ -35,18 +51,19 @@ const HabitTracker = ({ setActiveTab }) => {
     }
   };
 
-  // Handle editing a habit
-  const handleEdit = (habit) => {
-    setEditingHabit(habit.id);
-    setEditedHabit(habit.habit);
-    setEditedDescription(habit.description);
-  };
-
-  // Save the edited habit to Firestore
+  // Save the edited habit
   const saveEdit = async (id) => {
     try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
       const habitRef = doc(db, "habits", id);
-      await updateDoc(habitRef, { habit: editedHabit, description: editedDescription });
+      await updateDoc(habitRef, { 
+        habit: editedHabit, 
+        description: editedDescription,
+        updatedAt: new Date()
+      });
+      
       setHabitsList(
         habitsList.map((habit) =>
           habit.id === id ? { ...habit, habit: editedHabit, description: editedDescription } : habit
