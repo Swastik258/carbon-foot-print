@@ -3,16 +3,18 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import {
-  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, ChevronDown, LogOut, Menu
+  Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, 
+  ChevronDown, LogOut, Sun, Moon, Bell, Palette
 } from "lucide-react";
 import HabitTracker from "./HabitTracker";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import Impact from "./Impact";
+import Impact from "../impacts/Impact";
 import AddHabit from "../habits/AddHabit";
 import Goal from "./Goal";
+import Community from "./Community";
 
 const mockData = {
   weeklyProgress: [
@@ -37,7 +39,7 @@ const Dashboard = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [userName, setUserName] = useState("");
   const [habitsList, setHabitsList] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,13 +60,34 @@ const Dashboard = () => {
     navigate("/login");
   };
 
+  const themeColors = {
+    light: {
+      background: "bg-gray-100",
+      sidebar: "bg-white",
+      header: "bg-white",
+      text: "text-gray-800",
+      hover: "hover:bg-gray-50",
+      chartLine: "#059669",
+    },
+    dark: {
+      background: "bg-gray-900",
+      sidebar: "bg-gray-800",
+      header: "bg-gray-800",
+      text: "text-gray-100",
+      hover: "hover:bg-gray-700",
+      chartLine: "#10B981",
+    }
+  };
+
+  const currentTheme = isDarkMode ? themeColors.dark : themeColors.light;
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className={`flex h-screen ${currentTheme.background} transition-colors duration-300`}>
       {/* Sidebar */}
-      <div className={`w-64 bg-white shadow-lg fixed lg:relative transform transition-transform duration-200 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 z-30`}>
-        <div className="p-4 border-b flex items-center gap-2">
+      <div className={`w-64 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
           <Leaf className="text-emerald-500" />
-          <span className="text-xl font-bold text-emerald-800">EcoTrack</span>
+          <span className={`text-xl font-bold ${currentTheme.text}`}>EcoTrack</span>
         </div>
         
         <nav className="p-4">
@@ -79,15 +102,14 @@ const Dashboard = () => {
             ].map(({ icon: Icon, label, id }) => (
               <li key={id}>
                 <button
-                  onClick={() => {
-                    setActiveTab(id);
-                    setIsSidebarOpen(false); // Close sidebar on mobile after clicking a link
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                    activeTab === id ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:bg-gray-50"
+                  onClick={() => setActiveTab(id)}
+                  className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${
+                    activeTab === id 
+                    ? "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300" 
+                    : `${currentTheme.text} ${currentTheme.hover}`
                   }`}
                 >
-                  <Icon size={18} />
+                  <Icon size={18} className="flex-shrink-0" />
                   <span>{label}</span>
                 </button>
               </li>
@@ -99,94 +121,153 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {/* Header */}
-        <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-50"
-          >
-            <Menu size={24} className="text-gray-700" />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800 capitalize">{activeTab}</h1>
-          {/* Profile Section */}
-          <div className="relative">
+        <header className={`shadow-sm p-4 flex justify-between items-center ${currentTheme.header} transition-colors duration-300`}>
+          <h1 className={`text-2xl font-bold capitalize ${currentTheme.text}`}>
+            {activeTab}
+          </h1>
+          
+          <div className="flex items-center gap-4">
             <button 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-50"
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className={`p-2 rounded-lg ${currentTheme.hover}`}
             >
-              <User className="text-emerald-600" size={20} />
-              <span className="text-gray-700">{userName || "John Doe"}</span>
-              <ChevronDown className="text-gray-500" size={16} />
+              {isDarkMode ? (
+                <Sun className="text-yellow-400" size={20} />
+              ) : (
+                <Moon className="text-gray-600" size={20} />
+              )}
             </button>
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10">
-                <button className="w-full px-4 py-2 text-left text-black-600 hover:bg-gray-50">
-                  Profile
-                </button>
-                <button className="w-full px-4 py-2 text-left text-black-600 hover:bg-gray-50">
-                  Notification
-                </button>
-                <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-50">
-                  Sign Out
-                </button>
-              </div>
-            )}
+
+            <div className="relative">
+              <button 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className={`flex items-center gap-3 px-4 py-2 rounded-lg ${currentTheme.hover}`}
+              >
+                <User className="text-emerald-600 dark:text-emerald-400" size={20} />
+                <span className={currentTheme.text}>{userName || "John Doe"}</span>
+                <ChevronDown className={`${currentTheme.text}`} size={16} />
+              </button>
+              
+              {showProfileMenu && (
+                <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 z-10 ${currentTheme.sidebar} border border-gray-200 dark:border-gray-700`}>
+                  <button className={`w-full px-4 py-2 text-left ${currentTheme.text} ${currentTheme.hover}`}>
+                    <User size={16} className="mr-2 inline" /> Profile
+                  </button>
+                  <button className={`w-full px-4 py-2 text-left ${currentTheme.text} ${currentTheme.hover}`}>
+                    <Bell size={16} className="mr-2 inline" /> Notifications
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('settings')}
+                    className={`w-full px-4 py-2 text-left ${currentTheme.text} ${currentTheme.hover}`}
+                  >
+                    <Palette size={16} className="mr-2 inline" /> Theme Settings
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className={`w-full px-4 py-2 text-left text-red-600 ${currentTheme.hover}`}
+                  >
+                    <LogOut size={16} className="mr-2 inline" /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
         {/* Content */}
         <main className="p-6">
           {activeTab === "dashboard" && (
-            <>
-              {/* Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                {/* Weekly Progress Chart */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Weekly Carbon Savings</h3>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={mockData.weeklyProgress}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="day" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="carbonSaved" stroke="#059669" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Habits Progress */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Habits Progress</h3>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={mockData.habits}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="progress" fill="#059669" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div className={`rounded-xl p-6 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
+                <h3 className={`text-lg font-semibold mb-4 ${currentTheme.text}`}>
+                  Weekly Carbon Savings
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={mockData.weeklyProgress}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#4B5563" : "#E5E7EB"} />
+                    <XAxis 
+                      dataKey="day" 
+                      tick={{ fill: isDarkMode ? '#F3F4F6' : '#374151' }} 
+                    />
+                    <YAxis 
+                      tick={{ fill: isDarkMode ? '#F3F4F6' : '#374151' }} 
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+                        borderColor: isDarkMode ? '#374151' : '#E5E7EB',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="carbonSaved" 
+                      stroke={currentTheme.chartLine} 
+                      strokeWidth={2}
+                      dot={{ fill: currentTheme.chartLine, strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
-            </>
+
+              <div className={`rounded-xl p-6 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
+                <h3 className={`text-lg font-semibold mb-4 ${currentTheme.text}`}>
+                  Habits Progress
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={mockData.habits}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? "#4B5563" : "#E5E7EB"} />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fill: isDarkMode ? '#F3F4F6' : '#374151' }} 
+                    />
+                    <YAxis 
+                      tick={{ fill: isDarkMode ? '#F3F4F6' : '#374151' }} 
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+                        borderColor: isDarkMode ? '#374151' : '#E5E7EB',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="progress" 
+                      fill={currentTheme.chartLine}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           )}
 
-          {activeTab === "dashboard" && <h2>Welcome to your dashboard!</h2>}
           {activeTab === "habits" && (
             <HabitTracker
               setActiveTab={setActiveTab}
               habitsList={habitsList}
               setHabitsList={setHabitsList}
+              isDarkMode={isDarkMode}
             />
           )}
-          {activeTab === "impact" && <Impact />}
+          
+          {activeTab === "impact" && <Impact isDarkMode={isDarkMode} />}
+          
+          
           {activeTab === "add-habit" && (
             <AddHabit
               setActiveTab={setActiveTab}
               habitsList={habitsList}
               setHabitsList={setHabitsList}
+              isDarkMode={isDarkMode}
             />
           )}
-          {activeTab === "goals" && <Goal />}
+          
+          {activeTab === "goals" && <Goal isDarkMode={isDarkMode} />}
+
+          {activeTab === "community" && <Community isDarkMode={isDarkMode} />}
         </main>
       </div>
     </div>

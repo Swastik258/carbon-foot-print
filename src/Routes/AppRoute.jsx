@@ -5,9 +5,10 @@ import Signup from "../pages/Signup";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import HabitTracker from "../pages/HabitTracker";
-import Impact from "../pages/Impact";
+import Impact from "../impacts/Impact";
 import AddHabit from "../habits/AddHabit";
 import Goal from "../pages/Goal";
+import Community from "../pages/Community";
 
 function AppRoute() {
   return (
@@ -21,6 +22,7 @@ function AppRoute() {
         <Route path="/impact" element={<Impact />} />
         <Route path="/add-habit" element={<AddHabit />} />
         <Route path="/goal" element={<Goal />} />
+        <Route path="/community" element={<Community />} />
       </Routes>
     </Router>
   );
