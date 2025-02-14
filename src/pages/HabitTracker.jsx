@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { db,auth } from "../firebaseConfig"; // Firestore config
+import { db, auth } from "../firebaseConfig";
 import { 
   collection, 
   getDocs, 
@@ -9,13 +9,15 @@ import {
   query, 
   where 
 } from "firebase/firestore";
+import { FaLeaf, FaEdit, FaTrashAlt, FaPlus, FaSave } from "react-icons/fa";
+
 const HabitTracker = ({ setActiveTab }) => {
   const [habitsList, setHabitsList] = useState([]);
   const [editingHabit, setEditingHabit] = useState(null);
   const [editedHabit, setEditedHabit] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
 
-  // Fetch habits from Firestore on component mount
+  // Fetch habits from Firestore
   useEffect(() => {
     const fetchHabits = async () => {
       try {
@@ -38,7 +40,14 @@ const HabitTracker = ({ setActiveTab }) => {
     fetchHabits();
   }, []);
 
-  // Handle deleting a habit
+  // Handle habit editing initiation
+  const handleEdit = (habit) => {
+    setEditingHabit(habit.id);
+    setEditedHabit(habit.habit);
+    setEditedDescription(habit.description);
+  };
+
+  // Handle habit deletion
   const handleDelete = async (id) => {
     try {
       const currentUser = auth.currentUser;
@@ -51,7 +60,7 @@ const HabitTracker = ({ setActiveTab }) => {
     }
   };
 
-  // Save the edited habit
+  // Save edited habit
   const saveEdit = async (id) => {
     try {
       const currentUser = auth.currentUser;
@@ -76,69 +85,91 @@ const HabitTracker = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4">Habit Tracker</h2>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center mb-8">
+          <FaLeaf className="text-3xl text-emerald-600 mr-3" />
+          <h2 className="text-3xl font-bold text-emerald-800 font-serif">
+            Nature's Progress Tracker
+          </h2>
+        </div>
 
-      {/* Habit List */}
-      <ul className="space-y-4">
-        {habitsList.map((habit) => (
-          <li key={habit.id} className="p-4 border rounded-lg">
-            {editingHabit === habit.id ? (
-              // Edit Mode
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={editedHabit}
-                  onChange={(e) => setEditedHabit(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md"
-                />
-                <textarea
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md"
-                  rows="2"
-                />
-                <button
-                  onClick={() => saveEdit(habit.id)}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md"
-                >
-                  Save
-                </button>
+        {/* Habit List */}
+        <ul className="space-y-4">
+          {habitsList.map((habit) => (
+            <li 
+              key={habit.id} 
+              className="group relative transition-transform duration-200 hover:scale-[1.005]"
+            >
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-emerald-50 hover:shadow-emerald-100/30 transition-all">
+                {editingHabit === habit.id ? (
+                  // Edit Mode
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={editedHabit}
+                      onChange={(e) => setEditedHabit(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-emerald-50/50"
+                      placeholder="Habit name"
+                    />
+                    <textarea
+                      value={editedDescription}
+                      onChange={(e) => setEditedDescription(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-emerald-50/50"
+                      rows="3"
+                      placeholder="Describe your habit..."
+                    />
+                    <button
+                      onClick={() => saveEdit(habit.id)}
+                      className="bg-emerald-600 text-white px-6 py-2 rounded-lg flex items-center hover:bg-emerald-700 transition-colors"
+                    >
+                      <FaSave className="mr-2" />
+                      Save Changes
+                    </button>
+                  </div>
+                ) : (
+                  // Display Mode
+                  <div className="flex justify-between items-start">
+                    <div className="pr-4">
+                      <h3 className="text-xl font-semibold text-emerald-800 mb-2">
+                        {habit.habit}
+                      </h3>
+                      <p className="text-emerald-600/90 leading-relaxed">
+                        {habit.description}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(habit)}
+                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                        title="Edit habit"
+                      >
+                        <FaEdit className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(habit.id)}
+                        className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Delete habit"
+                      >
+                        <FaTrashAlt className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              // Display Mode
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-semibold">{habit.habit}</h3>
-                  <p className="text-gray-600">{habit.description}</p>
-                </div>
-                <div className="space-x-2">
-                  <button
-                    onClick={() => handleEdit(habit)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-md"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(habit.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-md"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
 
-      {/* Button to Open Add Habit Form */}
-      <button
-        onClick={() => setActiveTab("add-habit")}
-        className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-lg"
-      >
-        Add Habit
-      </button>
+        {/* Add Habit Button */}
+        <button
+          onClick={() => setActiveTab("add-habit")}
+          className="mt-8 bg-emerald-600 text-white px-6 py-3 rounded-xl flex items-center justify-center space-x-2 hover:bg-emerald-700 transition-all w-full shadow-lg hover:shadow-emerald-200"
+        >
+          <FaPlus className="w-5 h-5" />
+          <span className="font-semibold">Cultivate New Habit</span>
+        </button>
+      </div>
     </div>
   );
 };
