@@ -134,9 +134,18 @@ const HabitTracker = ({ setActiveTab }) => {
                       <h3 className="text-xl font-semibold text-emerald-800 mb-2">
                         {habit.habit}
                       </h3>
-                      <p className="text-emerald-600/90 leading-relaxed">
-                        {habit.description}
-                      </p>
+                      <p className="text-emerald-600/90 mb-3">{habit.description}</p>
+                      <div className="flex gap-4 text-sm">
+                        <div className="bg-green-100 px-3 py-1 rounded-full">
+                          🌱 {habit.co2Saved}kg CO₂
+                        </div>
+                        <div className="bg-blue-100 px-3 py-1 rounded-full">
+                          💧 {habit.waterConserved}L
+                        </div>
+                        <div className="bg-yellow-100 px-3 py-1 rounded-full">
+                          🛍️ {habit.plasticReduced}g
+                        </div>
+                      </div>
                     </div>
                     <div className="flex space-x-2">
                       <button
