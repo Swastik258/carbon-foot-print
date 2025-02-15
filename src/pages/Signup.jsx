@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebaseConfig';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 const Signup = () => {
@@ -17,37 +17,33 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
+
     try {
-      // Create user account
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        formData.email, 
-        formData.password
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       
-      // Update user profile with name
       await updateProfile(userCredential.user, {
         displayName: formData.name
       });
 
-      // Store additional user data in Firestore
+      await sendEmailVerification(userCredential.user);
+
       await setDoc(doc(db, "users", userCredential.user.uid), {
         name: formData.name,
         email: formData.email,
         createdAt: new Date(),
         habits: [],
-
         preferences: {
           theme: 'light',
           notifications: true
         },
       });
 
-      navigate('/dashboard');
+      navigate('/email-verification');
     } catch (err) {
       setError(err.message);
     }
@@ -82,6 +78,7 @@ const Signup = () => {
 
       {/* Right Side - Signup Form */}
       <div className="w-full lg:w-1/2 flex flex-col bg-gradient-to-b from-green-50 to-emerald-50">
+        {/* Mobile Navigation */}
         <nav className="lg:hidden w-full bg-white/90 backdrop-blur-md border-b border-emerald-100 shadow-sm p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -100,14 +97,21 @@ const Signup = () => {
         {/* Form Container */}
         <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
           <div className="w-full max-w-md space-y-4">
+            {/* Desktop Back Button */}
+            <button 
+              onClick={() => navigate('/')}
+              className="hidden lg:flex items-center text-emerald-600 hover:text-emerald-700 text-sm mb-2"
+            >
+              ← Back to Home
+            </button>
+
             <div className="text-center lg:text-left">
               <h2 className="text-2xl font-bold text-emerald-900">Create Account</h2>
               <p className="mt-1 text-sm text-emerald-600">Join our community of eco-warriors</p>
             </div>
 
-            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {error && <p className="text-red-500 text-sm p-2 bg-red-50 rounded-lg">{error}</p>}
 
-            {/* Email Signup Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-3">
                 <div>
@@ -169,7 +173,7 @@ const Signup = () => {
 
               <button
                 type="submit"
-                className="w-full bg-emerald-500 text-white py-2 rounded-lg shadow hover:shadow-lg transition-all hover:scale-105 text-sm"
+                className="w-full bg-emerald-500 text-white py-2 rounded-lg shadow hover:shadow-lg transition-all hover:scale-[1.02] text-sm"
               >
                 Create Account
               </button>
@@ -185,6 +189,16 @@ const Signup = () => {
                     Log in
                   </button>
                 </p>
+
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/forgot-password')}
+                    className="text-emerald-700 text-sm font-medium hover:text-emerald-800 underline-offset-2 hover:underline"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
               </div>
             </form>
           </div>
