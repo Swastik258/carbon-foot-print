@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name:  namespace-frontend
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 5173
+    targetPort: 5173
