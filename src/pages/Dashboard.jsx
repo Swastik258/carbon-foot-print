@@ -4,7 +4,7 @@ import {
 } from "recharts";
 import {
   Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, 
-  ChevronDown, LogOut, Sun, Moon, Bell, Palette
+  ChevronDown, LogOut, Sun, Moon, Bell, Palette, Menu
 } from "lucide-react";
 import HabitTracker from "./HabitTracker";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +40,7 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("");
   const [habitsList, setHabitsList] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,8 +84,20 @@ const Dashboard = () => {
 
   return (
     <div className={`flex h-screen ${currentTheme.background} transition-colors duration-300`}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-emerald-500 text-white shadow-lg"
+      >
+        <Menu size={24} />
+      </button>
+
       {/* Sidebar */}
-      <div className={`w-64 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
+      <div
+        className={`fixed md:relative w-64 h-full transform transition-transform duration-300 ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        } ${currentTheme.sidebar} z-40 shadow-lg`}
+      >
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
           <Leaf className="text-emerald-500" />
           <span className={`text-xl font-bold ${currentTheme.text}`}>EcoTrack</span>
@@ -102,7 +115,10 @@ const Dashboard = () => {
             ].map(({ icon: Icon, label, id }) => (
               <li key={id}>
                 <button
-                  onClick={() => setActiveTab(id)}
+                  onClick={() => {
+                    setActiveTab(id);
+                    setIsMobileMenuOpen(false);
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all ${
                     activeTab === id 
                     ? "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300" 
@@ -110,7 +126,7 @@ const Dashboard = () => {
                   }`}
                 >
                   <Icon size={18} className="flex-shrink-0" />
-                  <span>{label}</span>
+                  <span className="text-sm md:text-base">{label}</span>
                 </button>
               </li>
             ))}
@@ -118,11 +134,19 @@ const Dashboard = () => {
         </nav>
       </div>
 
+      {/* Backdrop for mobile sidebar */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 md:hidden z-30"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto md:ml-0">
         {/* Header */}
-        <header className={`shadow-sm p-4 flex justify-between items-center ${currentTheme.header} transition-colors duration-300`}>
-          <h1 className={`text-2xl font-bold capitalize ${currentTheme.text}`}>
+        <header className={`shadow-sm p-4 flex justify-between items-center ${currentTheme.header}`}>
+          <h1 className={`text-xl md:text-2xl font-bold capitalize ${currentTheme.text}`}>
             {activeTab}
           </h1>
           
@@ -144,7 +168,9 @@ const Dashboard = () => {
                 className={`flex items-center gap-3 px-4 py-2 rounded-lg ${currentTheme.hover}`}
               >
                 <User className="text-emerald-600 dark:text-emerald-400" size={20} />
-                <span className={currentTheme.text}>{userName || "John Doe"}</span>
+                <span className={`${currentTheme.text} text-sm md:text-base`}>
+                  {userName || "John Doe"}
+                </span>
                 <ChevronDown className={`${currentTheme.text}`} size={16} />
               </button>
               
@@ -175,11 +201,11 @@ const Dashboard = () => {
         </header>
 
         {/* Content */}
-        <main className="p-6">
+        <main className="p-4 md:p-6">
           {activeTab === "dashboard" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div className={`rounded-xl p-6 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
-                <h3 className={`text-lg font-semibold mb-4 ${currentTheme.text}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+              <div className={`rounded-xl p-4 md:p-6 shadow-lg ${currentTheme.sidebar}`}>
+                <h3 className={`text-base md:text-lg font-semibold mb-4 ${currentTheme.text}`}>
                   Weekly Carbon Savings
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
@@ -211,8 +237,8 @@ const Dashboard = () => {
                 </ResponsiveContainer>
               </div>
 
-              <div className={`rounded-xl p-6 shadow-lg ${currentTheme.sidebar} transition-colors duration-300`}>
-                <h3 className={`text-lg font-semibold mb-4 ${currentTheme.text}`}>
+              <div className={`rounded-xl p-4 md:p-6 shadow-lg ${currentTheme.sidebar}`}>
+                <h3 className={`text-base md:text-lg font-semibold mb-4 ${currentTheme.text}`}>
                   Habits Progress
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
@@ -254,7 +280,6 @@ const Dashboard = () => {
           )}
           
           {activeTab === "impact" && <Impact isDarkMode={isDarkMode} />}
-          
           
           {activeTab === "add-habit" && (
             <AddHabit
