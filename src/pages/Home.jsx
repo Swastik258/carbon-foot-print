@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import logo1 from "../assets/logo1.png";
 const Home = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,12 +10,18 @@ const Home = () => {
       {/* 🌿 Enhanced Navigation Bar */}
       <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-emerald-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3 group">
-            <span className="text-3xl text-emerald-600 animate-pulse">🌱</span>
-            <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
-              EcoTrack
-            </span>
-          </div>
+        <div className="flex items-center space-x-3 group">
+  {/* Logo Image */}
+  <img 
+  src={logo1}
+  alt="Emberate Logo"
+  className="h-12 w-12 object-contain"
+/>
+  {/* Text Logo - Optional (you can remove if you want only image) */}
+  <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
+    Emberate
+  </span>
+</div>
           
           {/* Mobile Menu Button */}
           <button 
@@ -288,7 +294,7 @@ const Home = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-3xl animate-bounce-slow">🌱</span>
-                <span className="text-xl font-bold">EcoTrack</span>
+                <span className="text-xl font-bold">Emberate</span>
               </div>
               <p className="text-emerald-200 text-lg">
                 "The Earth does not belong to us: we belong to the Earth."
@@ -350,7 +356,7 @@ const Home = () => {
 
           <div className="border-t border-emerald-800 pt-8 text-center">
             <p className="text-emerald-400">
-              © 2024 EcoTrack. Nurturing nature, nurturing life 🌍
+              © 2024 Emberate. Nurturing nature, nurturing life 🌍
             </p>
           </div>
         </div>

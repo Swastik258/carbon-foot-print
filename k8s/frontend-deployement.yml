@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name:  namespace-frontend
 spec:
+  replicas: 5
   selector:
     matchLabels:
     
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: <Image>
+        image: nginx:latest
         resources:
           limits:
             memory: "128Mi"
