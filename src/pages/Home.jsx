@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Analytics } from "@vercel/analytics/react"
 import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
 const Home = () => {
@@ -94,6 +95,7 @@ const Home = () => {
           </div>
         )}
       </nav>
+      <Analytics />
 
       {/* 🌳 Enhanced Hero Section */}
       <section className="relative h-screen flex items-center justify-center pt-16 overflow-hidden">
