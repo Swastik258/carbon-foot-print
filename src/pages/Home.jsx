@@ -11,18 +11,17 @@ const Home = () => {
       <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-emerald-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3 group">
-  {/* Logo Image */}
+  {/* Logo Image - Made it round */}
   <img 
-  src={logo1}
-  alt="Emberate Logo"
-  className="h-12 w-12 object-contain"
-/>
-  {/* Text Logo - Optional (you can remove if you want only image) */}
-  <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
+    src={logo1}
+    alt="Emberate Logo"
+    className="h-16 w-16 object-cover rounded-full border-2 border-emerald-200 shadow-sm"
+  />
+  {/* Text Logo - Enhanced styling */}
+  <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent hover:from-green-500 hover:to-emerald-600 transition-all duration-300">
     Emberate
   </span>
 </div>
-          
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
