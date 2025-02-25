@@ -100,7 +100,7 @@ const Dashboard = () => {
       >
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
           <Leaf className="text-emerald-500" />
-          <span className={`text-xl font-bold ${currentTheme.text}`}>EcoTrack</span>
+          <span className={`text-xl font-bold ${currentTheme.text}`}>Emberate</span>
         </div>
         
         <nav className="p-4">
