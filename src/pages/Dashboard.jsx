@@ -4,7 +4,8 @@ import {
 } from "recharts";
 import {
   Settings, User, Home, Calendar, Award, Leaf, TrendingDown, Users, 
-  ChevronDown, LogOut, Sun, Moon, Bell, Palette, Menu
+  ChevronDown, LogOut, Sun, Moon, Bell, Palette, Menu,
+  Calculator
 } from "lucide-react";
 import HabitTracker from "./HabitTracker";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ import Impact from "../impacts/Impact";
 import AddHabit from "../habits/AddHabit";
 import Goal from "./Goal";
 import Community from "./Community";
+import CarbonCal from "./CarbonCal";
 
 const mockData = {
   weeklyProgress: [
@@ -109,6 +111,8 @@ const Dashboard = () => {
               { icon: Home, label: "Dashboard", id: "dashboard" },
               { icon: Calendar, label: "Habits", id: "habits" },
               { icon: TrendingDown, label: "Impact", id: "impact" },
+              {icon: Calculator, label: "Calculator", id: "carbon-cal" },
+
               { icon: Award, label: "Goals", id: "goals" },
               { icon: Users, label: "Community", id: "community" },
               { icon: Settings, label: "Settings", id: "settings" },
@@ -289,10 +293,22 @@ const Dashboard = () => {
               isDarkMode={isDarkMode}
             />
           )}
-          
+
+
+           
+
           {activeTab === "goals" && <Goal isDarkMode={isDarkMode} />}
 
           {activeTab === "community" && <Community isDarkMode={isDarkMode} />}
+          {activeTab === "carbon-cal" && <CarbonCal isDarkMode={isDarkMode} />}
+
+          
+
+
+
+
+
+
         </main>
       </div>
     </div>

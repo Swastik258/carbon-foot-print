@@ -112,7 +112,7 @@ function Goal() {
         >
           🎯 Create New Goal
         </button>
-      </form>
+      </form>s
     </div>
     </div>
   );

@@ -11,6 +11,7 @@ import Goal from "../pages/Goal";
 import Community from "../pages/Community";
 import ForgotPassword from "../pages/ForgotPassword";
 import EmailVerification from "../pages/EmailVerification";
+import CarbonCal from "../pages/CarbonCal";
 
 function AppRoute() {
   return (
@@ -26,7 +27,9 @@ function AppRoute() {
         <Route path="/goal" element={<Goal />} />
         <Route path="/community" element={<Community />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+
         <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/carbon-cal" element={<CarbonCal />} />
       </Routes>
     </Router>
   );
