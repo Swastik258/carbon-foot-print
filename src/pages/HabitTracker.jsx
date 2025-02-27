@@ -21,10 +21,6 @@ const HabitTracker = ({ setActiveTab }) => {
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [apiError, setApiError] = useState("");
 
-  // Initialize Gemini AI with error handling
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
   // Verify API key on component mount
   useEffect(() => {
     if (!import.meta.env.VITE_GEMINI_API_KEY) {
@@ -55,7 +51,7 @@ const HabitTracker = ({ setActiveTab }) => {
     fetchHabits();
   }, []);
 
-  // AI Suggestion Handler with enhanced error handling
+  // AI Suggestion Handler with updated API configuration
   const getEcoTips = async (habitName) => {
     if (apiError) return;
     
@@ -63,6 +59,20 @@ const HabitTracker = ({ setActiveTab }) => {
       setLoadingAI(true);
       setAiSuggestions([]);
       
+      // Updated GenAI initialization - move this inside the function to ensure fresh instance
+      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+      
+      // Updated model name and configuration
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-pro",  // Updated model name
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      });
+
       const prompt = `Provide 3 practical eco-friendly enhancements for: ${habitName}. 
         Include specific metrics. Format as:
         🌱 [Action] - [Environmental Impact]
@@ -82,9 +92,21 @@ const HabitTracker = ({ setActiveTab }) => {
       setAiSuggestions(tips.length > 0 ? tips : ["🌿 No suggestions available"]);
     } catch (error) {
       console.error("AI Error:", error);
-      setAiSuggestions([`⚠️ ${error.message.includes("API_KEY") ? 
-        "Invalid API Key - Check Configuration" : 
-        "Failed to fetch suggestions"}`]);
+      
+      // Enhanced error handling with more specific messages
+      let errorMessage = "Failed to fetch suggestions";
+      
+      if (error.message.includes("API_KEY")) {
+        errorMessage = "Invalid API Key - Check Configuration";
+      } else if (error.message.includes("not found") || error.message.includes("models")) {
+        errorMessage = "Invalid model name - Update API configuration";
+      } else if (error.message.includes("fetch") || error.message.includes("network")) {
+        errorMessage = "Network error - Check your connection";
+      } else if (error.status === 429) {
+        errorMessage = "API rate limit exceeded - Try again later";
+      }
+      
+      setAiSuggestions([`⚠️ ${errorMessage}`]);
     } finally {
       setLoadingAI(false);
     }
