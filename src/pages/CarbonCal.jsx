@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { 
@@ -110,7 +114,7 @@ function CarbonCal() {
 
     // Generate AI Tips
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
       const prompt = `As a sustainability expert, provide 5 specific, numbered recommendations for:
         ${userInfo.name ? `Name: ${userInfo.name}, ` : ''}
         Location: ${userInfo.country}, 
@@ -139,6 +143,38 @@ function CarbonCal() {
     setLoading(false);
   };
 
+  
+// Add this function to get the appropriate label
+const getQuantityLabel = (category, type) => {
+  const labels = {
+    transportation: {
+      car: "Distance (km)",
+      motorcycle: "Distance (km)",
+      bus: "Distance (km)",
+      flight: "Flight hours",
+      train: "Distance (km)",
+      bicycle: "Distance (km)"
+    },
+    energy: {
+      electricity: "Energy used (kWh)",
+      natural_gas: "Volume used (m³)",
+      solar: "Energy used (kWh)",
+      heating_oil: "Volume used (L)",
+      propane: "Volume used (L)"
+    },
+    lifestyle: {
+      meat: "Amount consumed (kg)",
+      dairy: "Amount consumed (kg)",
+      fast_fashion: "Items purchased",
+      electronics: "Items purchased",
+      recycling: "Amount recycled (kg)"
+    }
+  };
+
+ 
+  
+  return labels[category]?.[type] || "Quantity";
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -278,15 +314,17 @@ function CarbonCal() {
                       </div>
 
                       <div>
-                        <label className="block text-sm text-gray-700 mb-2">Quantity</label>
-                        <input
-                          type="number"
-                          value={habit.value}
-                          onChange={(e) => updateHabit(habit.id, 'value', e.target.value)}
-                          className="w-full p-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                          placeholder="Enter number"
-                        />
-                      </div>
+  <label className="block text-sm text-gray-700 mb-2">
+    {getQuantityLabel(habit.category, habit.type)}
+  </label>
+  <input
+    type="number"
+    value={habit.value}
+    onChange={(e) => updateHabit(habit.id, 'value', e.target.value)}
+    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-green-500"
+    placeholder="Enter number"
+  />
+</div>
                     </div>
                   </div>
                 ))}
@@ -385,6 +423,13 @@ function CarbonCal() {
             >
               Start New Calculation
             </button>
+
+            <button  className="w-full bg-blue-500text-gray-700 py-4 rounded-xl font-semibold
+                hover:bg-gray-200 transition-colors">
+              Download Reports
+            </button>
+        <div>
+          </div>
           </div>
         )}
       </div>
