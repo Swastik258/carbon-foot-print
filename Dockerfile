@@ -1,20 +1,18 @@
-# Use Node.js as the base image
+# Use the official Node.js image as base
 FROM node:latest
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (to cache dependencies)
+# Copy package.json and install dependencies
 COPY package.json package-lock.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy all project files to the container
+# Copy the entire project into the container
 COPY . .
 
-# Expose the Vite development server port (default is 5173)
+# Expose Vite's default port (5173)
 EXPOSE 5173
 
-# Start the development server
-CMD ["npm", "run", "dev", "--", "--host"]
+# Start the Vite development server
+CMD ["npm", "run", "dev"]
