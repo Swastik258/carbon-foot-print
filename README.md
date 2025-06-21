@@ -6,14 +6,11 @@
 
 ---
 
-### ✅ Suggested `README.md`:
 
 ```markdown
 # 🌱 Carbon Footprint Tracker – CI/CD Pipeline Project
 
 This project demonstrates a complete CI/CD pipeline using **Jenkins**, **Docker**, and **AWS EC2**. It automatically builds, pushes, and deploys a React-based Carbon Footprint Tracking web application using Docker and Docker Hub.
-
-![Project Screenshot](./screenshot.png) <!-- Replace with actual image path in repo -->
 
 ---
 
@@ -24,7 +21,7 @@ This project demonstrates a complete CI/CD pipeline using **Jenkins**, **Docker*
 - **Containerization**: Docker
 - **Image Registry**: Docker Hub
 - **Deployment**: Docker run on EC2 (port 5173)
-- **Live Preview**: http://13.233.197.217:5173
+- **Live Preview**: https://github.com/Swastik258/carbon-foot-print
 
 ---
 
