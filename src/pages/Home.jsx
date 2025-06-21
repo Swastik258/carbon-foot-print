@@ -110,7 +110,7 @@ const Home = () => {
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg space-y-4">
             <div className="animate-float">🌎</div>
-            <div>Track Your Carbon Footprint,</div>
+            <div>Track My Carbon Footprint,</div>
             <span className="text-emerald-300 bg-gradient-to-r from-emerald-300 to-green-400 bg-clip-text text-transparent">
               Save the Planet!
             </span>
