@@ -126,10 +126,4 @@ GitHub: [Swastik258](https://github.com/Swastik258)
 
 ---
 
-## 📜 License
-
-MIT License
-```
-
----
 
