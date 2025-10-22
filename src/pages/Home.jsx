@@ -58,7 +58,7 @@ const Home = () => {
               onClick={() => navigate("/login")}
               className="border-2 border-emerald-500 text-emerald-600 px-6 py-2 rounded-full hover:bg-emerald-50 transition-colors font-medium flex items-center gap-2 hover:-translate-y-0.5"
             >
-              <span>🌱 Login</span>
+              <span>🌱 Sign In</span>
             </button>
           </div>
         </div>
