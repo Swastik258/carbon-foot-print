@@ -2,9 +2,33 @@ import React, { useState } from "react";
 import { Analytics } from "@vercel/analytics/react"
 import { useNavigate } from "react-router-dom";
 import logo1 from "../assets/logo1.png";
+import ClientMonitor from "@sixthsense/sixthsense-javascript-agent";
+
 const Home = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  ClientMonitor.register({
+  service: "My Project", // Name the app
+  collector: 'https://http-collector-observability.sixthsense.rakuten.com/oap',
+  pagePath:"index.html",
+  serviceVersion: "1.2.1",
+  enableSPA: true,
+  useFmp: true,
+  autoTracePerf: true,
+  detailMode: true,
+  enableDirectFetchPatching: false,
+  environment: "production",
+  authorization: "eyJhbGciOiJIUzI1NiJ9.eyJiaWxsaW5nX2lkIjoiMTUwNzNkZWYtNDhlZC00M2UwLTg0ODUtMjkyOTIzYzRiOTdiIiwidGVhbUlkIjoiY2RiMTM2ZTMtMjRhYi00N2VmLWIyYjAtYzZkY2U0YmFiNGQ2IiwiYXVkIjoib2FwIiwiaXNzIjoic2l4dGgtc2Vucy1hdXRoIiwiaWF0IjoxNzYzOTcxODUxfQ.kNyuahPftkOKjq6XIHVK6QKY9e40T4FF1UlyWzSvWiQ",
+});
+ 
+ClientMonitor.setPerformance({
+  service: "My Project", 
+  collector: 'https://http-collector-observability.sixthsense.rakuten.com/oap',
+  serviceVersion: "1.2.1",
+  perfInterval: 1000,
+  useFmp: true,
+  authorization: "eyJhbGciOiJIUzI1NiJ9.eyJiaWxsaW5nX2lkIjoiMTUwNzNkZWYtNDhlZC00M2UwLTg0ODUtMjkyOTIzYzRiOTdiIiwidGVhbUlkIjoiY2RiMTM2ZTMtMjRhYi00N2VmLWIyYjAtYzZkY2U0YmFiNGQ2IiwiYXVkIjoib2FwIiwiaXNzIjoic2l4dGgtc2Vucy1hdXRoIiwiaWF0IjoxNzYzOTcxODUxfQ.kNyuahPftkOKjq6XIHVK6QKY9e40T4FF1UlyWzSvWiQ" 
+ });
 
   return (
     <div className="bg-gradient-to-b from-green-50 to-emerald-50">

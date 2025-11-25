@@ -14,6 +14,7 @@
     "@heroicons/react": "^2.2.0",
     "@react-firebase/auth": "^0.2.10",
     "@react-firebase/firestore": "^0.5.5",
+    "@sixthsense/sixthsense-javascript-agent": "^3.7.8",
     "@tailwindcss/vite": "^4.0.3",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
