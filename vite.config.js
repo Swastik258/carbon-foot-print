@@ -6,7 +6,8 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    port: 5173,        // Vite dev server port
-    host: '0.0.0.0',   // Allow access from everywhere (Docker / LAN / VM)
+  port: 5173,
+  host: '0.0.0.0',
+  allowedHosts: 'all',
   },
 })
